@@ -1,101 +1,69 @@
-# 🕵️‍♂️ Real-time Liar Game (Node.js & Socket.io)
+# 🕵️‍♂️ Real-time Liar Game (Dockerized)
 
-Node.js, Express, Socket.io, MySQL을 활용하여 개발한 실시간 멀티플레이어 라이어 게임입니다.
-이 가이드는 **AWS EC2 (Ubuntu 24.04/22.04 LTS)** 환경에서 배포하고 실행하는 방법을 다룹니다.
+Node.js, Socket.io, MySQL을 활용하여 개발한 실시간 멀티플레이어 라이어 게임입니다.
+**AWS EC2 (Amazon Linux 2023)** 환경에서 **Docker & Docker Compose**를 사용하여 배포되었습니다.
 
-## 📋 사전 요구 사항 (Prerequisites)
+## 🛠 Tech Stack
 
-  * AWS EC2 인스턴스 (OS: Ubuntu 권장)
-  * EC2 보안 그룹(Security Group) 설정: **3000번 포트(Custom TCP)** 개방 필수
-
------
-
-## 🚀 1. 서버 환경 설정 (EC2 접속 후)
-
-터미널(Putty, Termius 등)로 EC2에 접속한 뒤, 아래 명령어를 순서대로 입력하여 환경을 구축합니다.
-
-### 1-1. 시스템 업데이트 및 필수 패키지 설치
-
-```bash
-sudo apt update
-sudo apt upgrade -y
-sudo apt install git -y
-```
-
-### 1-2. MySQL 설치 및 설정
-
-```bash
-# MySQL 서버 설치
-sudo apt install mysql-server -y
-
-# MySQL 접속 (비밀번호 없이 접속됨)
-sudo mysql
-
-# --- [MySQL 내부 SQL 명령어] ---
--- 1. root 계정 비밀번호 설정 ('1234' 부분에 원하는 비밀번호 입력)
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '1234';
-
--- 2. 데이터베이스 생성
-CREATE DATABASE liargame;
-
--- 3. 적용 및 종료
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-### 1-3. Node.js 설치 (NVM 사용 권장)
-
-```bash
-# NVM (Node Version Manager) 설치
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-
-# 환경변수 적용 (또는 터미널 재접속)
-source ~/.bashrc
-
-# Node.js 최신 LTS 버전 설치
-nvm install --lts
-
-# 설치 확인
-node -v
-npm -v
-```
+  * **Frontend:** HTML5, CSS3, Vanilla JavaScript
+  * **Backend:** Node.js, Express, Socket.io
+  * **Database:** MySQL (8.0), Sequelize ORM
+  * **DevOps:** Docker, Docker Compose, AWS EC2
 
 -----
 
-## 📥 2. 프로젝트 설치 (Installation)
+## 📋 Database Schema (ERD)
 
-### 2-1. 소스 코드 다운로드 (Git Clone)
+  * **Users:** 사용자 정보 (아이디, 비밀번호, 닉네임)
+  * **Themes:** 게임 주제 (예: 음식, 동물)
+  * **Keywords:** 주제별 제시어 (1:N 관계)
+
+-----
+
+## 🚀 Installation & Deployment (AWS EC2 + Docker)
+
+이 가이드는 **Amazon Linux 2023** 환경을 기준으로 작성되었습니다.
+
+### 1\. 사전 준비 (Prerequisites)
+
+서버에 접속하여 필수 패키지(Git, Docker, Docker Compose)를 설치하고, **Buildx 최신 버전**을 수동으로 업데이트해야 합니다. (Amazon Linux 기본 패키지 버전 호환성 문제 해결)
 
 ```bash
-# 깃허브에서 프로젝트 클론
-git clone https://github.com/Ow-wL/LiarGame.git
+# 1. 시스템 업데이트 및 Git/Docker 설치
+sudo yum update -y
+sudo yum install git docker -y
 
-# 프로젝트 폴더로 이동
+# 2. Docker 실행 및 권한 부여
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker ec2-user
+
+# 3. Docker Compose 설치 (최신 버전)
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+# 4. Docker Buildx 플러그인 수동 업데이트 (중요: v0.19.3 이상 필수)
+mkdir -p ~/.docker/cli-plugins
+curl -SL https://github.com/docker/buildx/releases/download/v0.19.3/buildx-v0.19.3.linux-amd64 -o ~/.docker/cli-plugins/docker-buildx
+chmod +x ~/.docker/cli-plugins/docker-buildx
+
+# (권한 적용을 위해 터미널 재접속 권장)
+```
+
+### 2\. 프로젝트 설정 (Setup)
+
+```bash
+# 1. 프로젝트 클론
+git clone <YOUR_GITHUB_REPO_URL>
 cd LiarGame
-```
 
-### 2-2. 라이브러리 설치
-
-```bash
-npm install
-```
-
------
-
-## ⚙️ 3. 설정 파일 수정 (Configuration)
-
-GitHub에는 보안상 `config.json`이 올라가지 않거나, 로컬 설정으로 되어 있을 수 있습니다. EC2 환경에 맞게 수정해야 합니다.
-
-### 3-1. config.json 생성/수정
-
-```bash
-# 편집기로 파일 열기
+# 2. 설정 파일 생성
 nano src/config/config.json
 ```
 
-### 3-2. 내용 입력 (MySQL 비밀번호 일치시키기)
+**`src/config/config.json`** 내용을 아래와 같이 작성합니다.
 
-아래 내용을 복사해서 붙여넣고, **password** 부분을 아까 설정한 MySQL 비밀번호(예: 1234)로 변경하세요.
+> **주의:** Docker 내부 통신이므로 host는 반드시 `"db"`여야 합니다.
 
 ```json
 {
@@ -103,75 +71,60 @@ nano src/config/config.json
     "username": "root",
     "password": "1234",
     "database": "liargame",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "mysql",
     "timezone": "+09:00"
   }
 }
 ```
 
-*(수정 후 저장: `Ctrl + O` 엔터 -\> `Ctrl + X` 종료)*
+### 3\. 서버 실행 (Run with Docker)
+
+```bash
+# 빌드 및 백그라운드 실행
+docker-compose up -d --build
+
+# 실행 상태 확인
+docker-compose ps
+```
+
+### 4\. 데이터베이스 초기화 (Data Seeding)
+
+컨테이너가 실행된 상태에서 초기 데이터(주제, 제시어)를 삽입합니다.
+
+```bash
+# 실행 중인 app 컨테이너 내부에서 스크립트 실행
+docker-compose exec app node src/seed.js
+```
+
+### 5\. 접속 확인
+
+브라우저에서 `http://[EC2-Public-IP]:3000` 으로 접속합니다.
 
 -----
 
-## 🗄️ 4. 데이터베이스 초기화 (DB Setup)
+## ⚠️ Troubleshooting (이슈 해결 기록)
 
-서버 코드를 이용하여 테이블을 생성하고, 초기 데이터(주제, 제시어)를 넣습니다.
+개발 및 배포 과정에서 발생했던 주요 이슈와 해결 방법입니다.
 
-```bash
-# 1. 서버를 잠시 실행하여 테이블 자동 생성 (Sequelize Sync)
-# ("Executing (default): CREATE TABLE..." 로그가 뜨면 Ctrl+C로 종료)
-node src/app.js
+### 1\. AWS Security Group (접속 불가)
 
-# 2. 초기 데이터(주제/제시어) 삽입 (Seed 실행)
-node src/seed.js
-```
+  * **증상:** 서버는 켜져 있으나 브라우저에서 `Connection refused` 또는 무한 로딩 발생.
+  * **해결:** AWS EC2 보안 그룹(Security Group) 인바운드 규칙에 **TCP 3000 (0.0.0.0/0)** 추가.
 
------
+### 2\. Docker Buildx Version Error
 
-## ▶️ 5. 서버 실행 (Run Server)
+  * **증상:** `docker-compose up` 시 `compose build requires buildx 0.17 or later` 에러 발생.
+  * **원인:** Amazon Linux yum 저장소의 기본 buildx 버전이 낮음.
+  * **해결:** GitHub 릴리즈에서 최신 바이너리를 직접 다운로드하여 `~/.docker/cli-plugins/`에 설치함.
 
-### 5-1. 개발 모드 실행 (테스트용)
+### 3\. Case Sensitivity (대소문자 구분)
 
-로그를 실시간으로 확인하고 싶을 때 사용합니다. 터미널을 끄면 서버도 꺼집니다.
+  * **증상:** 로컬(Windows)에서는 잘 되는데, Docker/EC2(Linux)에서 `Cannot find module './user'` 에러 발생.
+  * **원인:** Windows는 대소문자를 구분하지 않지만, Linux는 구분함 (`User.js` \!= `user.js`).
+  * **해결:** `src/models/` 내부의 파일명을 모두 소문자(`user.js`, `theme.js` 등)로 통일하고 코드의 `require` 경로도 소문자로 수정.
 
-```bash
-npm start
-```
+### 4\. Database Connection
 
-### 5-2. 배포 모드 실행 (PM2 사용 - 추천)
-
-터미널을 종료해도 서버가 계속 돌아가게 하려면 **PM2**를 사용합니다.
-
-```bash
-# PM2 전역 설치
-npm install -g pm2
-
-# 서버 실행 (app.js는 진입점 파일)
-pm2 start src/app.js --name "liargame"
-
-# 상태 확인
-pm2 status
-
-# (선택) 서버 재부팅 시 자동 실행 설정
-pm2 startup
-pm2 save
-```
-
------
-
-## ❓ 문제 해결 (Troubleshooting)
-
-1.  **접속이 안 돼요\!**
-
-      * EC2 대시보드 -\> 보안 그룹(Security Group) -\> 인바운드 규칙 편집에서 **TCP 3000** 포트가 열려있는지 확인하세요. (소스: 0.0.0.0/0)
-      * 브라우저 주소: `http://[EC2_퍼블릭_IP]:3000`
-
-2.  **MySQL 에러 (`ER_NOT_SUPPORTED_AUTH_MODE` 등)**
-
-      * `src/config/config.json`의 비밀번호가 맞는지 확인하세요.
-      * MySQL 접속 후 `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '비밀번호';` 명령어를 다시 실행해보세요.
-
-3.  **수정사항 업데이트**
-
-      * 로컬에서 수정 후 GitHub에 Push -\> EC2에서 `git pull` -\> `pm2 restart liargame`
+  * **증상:** Docker 실행 시 DB 연결 실패.
+  * **해결:** `config.json`의 host를 `localhost`가 아닌 Docker Service Name인 \*\*`"db"`\*\*로 설정.

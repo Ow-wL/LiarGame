@@ -10,10 +10,9 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 // 2. 모델 불러오기 (제가 드린 User.js와 호환되는 방식)
-// 파일명은 소문자('user')여야 합니다 (제가 src/models/user.js 로 만들라고 했으므로)
-db.User = require('./user')(sequelize, Sequelize);
-db.Theme = require('./theme')(sequelize, Sequelize);
-db.Keyword = require('./keyword')(sequelize, Sequelize);
+db.User = require('./User')(sequelize, Sequelize);
+db.Theme = require('./Theme')(sequelize, Sequelize);
+db.Keyword = require('./Keyword')(sequelize, Sequelize);
 // db.GameHistory = require('./gameHistory')(sequelize, Sequelize);
 // db.GameResult = require('./gameResult')(sequelize, Sequelize);
 
