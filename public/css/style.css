@@ -342,3 +342,22 @@ button:hover { transform: scale(1.05); }
 .ready-btn.cancel {
     background: #555; box-shadow: none;
 }
+
+/* 로그인 & 회원가입 스타일 */
+.switch-txt {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #aaa;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.switch-txt:hover { color: white; }
+
+.secondary-btn {
+    background-color: #555; /* 가입 버튼은 약간 다른 색 */
+}
+.secondary-btn:hover { background-color: #777; }
+
+#login-form-box, #signup-form-box {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+}

@@ -1,25 +1,16 @@
-const Sequelize = require('sequelize');
-
-class Keyword extends Sequelize.Model {
-  static initiate(sequelize) {
-    Keyword.init({
-      word: {
-        type: Sequelize.STRING(100),
-        allowNull: false,
-      },
+module.exports = (sequelize, DataTypes) => {
+    const Keyword = sequelize.define('Keyword', {
+        word: {
+            type: DataTypes.STRING(20),
+            allowNull: false,
+        },
+        theme_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        }
     }, {
-      sequelize,
-      timestamps: false,
-      modelName: 'Keyword',
-      tableName: 'Keywords',
-      charset: 'utf8',
-      collate: 'utf8_general_ci',
+        timestamps: false,
+        tableName: 'Keywords',
     });
-  }
-
-  static associate(db) {
-    db.Keyword.belongsTo(db.Theme, { foreignKey: 'theme_id', targetKey: 'id' });
-  }
-}
-
-module.exports = Keyword;
+    return Keyword;
+};

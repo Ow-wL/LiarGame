@@ -8,6 +8,8 @@ npm install express socket.io mysql2 sequelize dotenv cors
     dotenv: 환경 변수 관리
     cors: 다른 도메인 간 통신 허용
 
+npm install bcrypt cors
+
 # 노드몬 (수정 시 서버 자동 재실행)
 npm install -D nodemon 
 

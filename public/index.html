@@ -11,8 +11,21 @@
         
         <div id="login-screen" class="screen">
             <div class="logo-area">🕵️ LIAR GAME</div>
-            <input type="text" id="nickname-input" placeholder="닉네임 (3~8글자)" maxlength="8">
-            <button id="login-btn">입장하기</button>
+
+            <div id="login-form-box">
+                <input type="text" id="login-id" placeholder="아이디">
+                <input type="password" id="login-pw" placeholder="비밀번호">
+                <button id="login-btn">로그인</button>
+                <p class="switch-txt" onclick="toggleAuthMode()">계정이 없으신가요? 회원가입</p>
+            </div>
+
+            <div id="signup-form-box" class="hidden">
+                <input type="text" id="reg-id" placeholder="아이디 (영문/숫자)">
+                <input type="password" id="reg-pw" placeholder="비밀번호">
+                <input type="text" id="reg-nick" placeholder="닉네임 (중복불가)">
+                <button id="register-btn" class="secondary-btn">가입하기</button>
+                <p class="switch-txt" onclick="toggleAuthMode()">이미 계정이 있으신가요? 로그인</p>
+            </div>
         </div>
 
         <div id="lobby-screen" class="screen hidden">
