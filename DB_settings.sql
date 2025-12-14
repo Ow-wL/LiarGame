@@ -1,2 +1,0 @@
-DROP DATABASE liargame;
-CREATE DATABASE liargame;
