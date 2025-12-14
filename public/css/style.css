@@ -1,0 +1,344 @@
+:root {
+    --bg-dark: #222831;
+    --bg-light: #393e46;
+    --accent: #00adb5;
+    --text: #eeeeee;
+    --danger: #ff2e63;
+}
+
+body {
+    margin: 0;
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text);
+    overflow: hidden; /* 스크롤 방지 */
+}
+
+.screen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden { display: none !important; }
+
+/* 로그인 & 대기실 */
+.logo-area { font-family: 'Black Han Sans'; font-size: 3rem; color: var(--accent); margin-bottom: 20px; }
+input { padding: 15px; border-radius: 30px; border: none; text-align: center; width: 250px; font-size: 1.1rem; }
+button { padding: 12px 25px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+button:hover { transform: scale(1.05); }
+
+/* 게임 화면 레이아웃 */
+.top-bar {
+    position: absolute; top: 0; width: 100%; height: 60px;
+    background: rgba(0,0,0,0.3);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 20px; box-sizing: border-box;
+    z-index: 100;
+}
+.exit-btn { background: var(--danger); color: white; padding: 5px 15px; font-size: 0.8rem; }
+
+/* 메인 게임 영역 */
+.game-area {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 제시어 카드 */
+.card {
+    position: absolute;
+    top: 80px; left: 20px;
+    background: white; color: black;
+    padding: 15px; border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    text-align: center; z-index: 50;
+    animation: slideDown 0.5s;
+}
+.card-title { font-size: 0.8rem; color: #666; font-weight: bold; }
+.card-content { font-size: 1.5rem; font-weight: bold; color: var(--bg-dark); }
+
+/* 원형 테이블 */
+.table-container {
+    width: 500px; height: 500px;
+    position: relative;
+}
+.table-bg {
+    width: 300px; height: 300px;
+    background: var(--bg-light);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    border: 10px solid #2b2b2b;
+    display: flex; justify-content: center; align-items: center;
+}
+.center-text { font-family: 'Black Han Sans'; font-size: 3rem; color: rgba(255,255,255,0.1); }
+
+/* 플레이어 아바타 */
+.player-avatar {
+    position: absolute;
+    width: 80px; height: 80px;
+    background: #0f4c75;
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    border: 4px solid transparent;
+    transition: all 0.3s;
+    font-weight: bold;
+    /* 중앙 정렬용 */
+    top: 50%; left: 50%;
+    margin-top: -40px; margin-left: -40px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+}
+
+/* 턴 활성화 효과 */
+.active-turn {
+    border-color: var(--accent);
+    box-shadow: 0 0 25px var(--accent), inset 0 0 10px var(--accent); /* 발광 효과 강화 */
+    z-index: 20;
+    background-color: #1a1a2e; /* 배경색을 살짝 어둡게 */
+}
+
+/* 투표 모드 효과 */
+.voting-target {
+    animation: pulseRed 1s infinite;
+    cursor: pointer !important;
+    z-index: 1000 !important; 
+    position: absolute; 
+}
+
+.voting-target:hover {
+    border-color: var(--danger);
+    box-shadow: 0 0 20px var(--danger);
+    background-color: #2c0b0e;
+}
+
+@keyframes pulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(255, 46, 99, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 46, 99, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 46, 99, 0); }
+}
+
+/* 탈락자 효과 */
+.dead-player {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    border: 2px solid #555;
+}
+
+/* 말풍선 */
+.bubble {
+    position: absolute;
+    bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: white; color: black;
+    padding: 8px 15px; border-radius: 15px;
+    font-size: 0.9rem; white-space: nowrap;
+    opacity: 0; transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 100;
+}
+.bubble::after {
+    content: ''; position: absolute; bottom: -5px; left: 50%;
+    border-width: 5px; border-style: solid;
+    border-color: white transparent transparent transparent;
+}
+
+/* 하단 패널 */
+.bottom-panel {
+    position: absolute; bottom: 20px; width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+
+/* 타임 게이지 */
+#turn-gauge-container { width: 60%; max-width: 600px; text-align: center; }
+.gauge-label { font-size: 0.8rem; margin-bottom: 5px; color: var(--accent); }
+.gauge-bar-bg { width: 100%; height: 10px; background: #555; border-radius: 5px; overflow: hidden; }
+.gauge-bar-fill {
+    height: 100%; width: 100%; background: var(--accent);
+    transition: width 1s linear; /* 1초마다 부드럽게 줄어듦 */
+}
+
+/* 미니 채팅 로그 & 입력창 */
+.chat-wrapper { width: 60%; max-width: 600px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
+.mini-chat-log { height: 80px; overflow-y: auto; font-size: 0.8rem; margin-bottom: 5px; color: #bbb; text-align: left; }
+.input-area { display: flex; gap: 5px; }
+.input-area input { flex: 1; padding: 10px; text-align: left; font-size: 1rem; width: auto;}
+.start-btn { position: absolute; bottom: 120px; background: var(--accent); color: white; font-size: 1.5rem; padding: 15px 40px; box-shadow: 0 0 20px var(--accent); }
+
+@keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 80px; opacity: 1; } }
+
+/* 대기실 레이아웃 */
+.lobby-header { margin-bottom: 20px; }
+.create-room-box { 
+    display: flex; gap: 10px; margin-bottom: 30px; 
+    background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px;
+}
+.room-list-container { width: 100%; max-width: 800px; }
+.room-list-container h3 { border-bottom: 2px solid #555; padding-bottom: 10px; text-align: left; margin-bottom: 15px; color: #aaa; }
+
+/* 방 목록 그리드 */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+/* 방 카드 스타일 */
+.room-card {
+    background: #393e46;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    border: 1px solid #555;
+    text-align: left;
+}
+.room-card:hover {
+    transform: translateY(-5px);
+    background: #4b5563;
+    border-color: var(--accent);
+}
+.room-card.playing {
+    border-color: var(--danger);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.room-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; color: white; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.room-info { font-size: 0.8rem; color: #aaa; display: flex; justify-content: space-between; }
+.badge { padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: white; }
+.badge.wait { background: var(--accent); }
+.badge.play { background: var(--danger); }
+
+.no-room-msg { grid-column: 1 / -1; color: #777; padding: 20px; }
+
+/* 3D 카드 컨테이너 */
+.card-container {
+    position: absolute;
+    top: 100px; left: 30px;
+    width: 120px; height: 160px;
+    perspective: 1000px; /* 3D 원근감 */
+    z-index: 50;
+    cursor: pointer;
+}
+
+/* 카드 내부 (회전체) */
+.card-inner {
+    position: relative;
+    width: 100%; height: 100%;
+    text-align: center;
+    transition: transform 0.8s; /* 0.8초 동안 회전 */
+    transform-style: preserve-3d;
+}
+
+/* .flipped 클래스가 붙으면 180도 회전 */
+.card-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+/* 앞면/뒷면 공통 */
+.card-front, .card-back {
+    position: absolute;
+    width: 100%; height: 100%;
+    backface-visibility: hidden; /* 뒷면 안 보이게 */
+    border-radius: 10px;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+/* 앞면 스타일 (로고) */
+.card-front {
+    background: linear-gradient(45deg, #2c3e50, #000000);
+    color: var(--accent);
+    font-family: 'Black Han Sans';
+    font-size: 1.5rem;
+    border: 2px solid #555;
+}
+
+/* 뒷면 스타일 (제시어) */
+.card-back {
+    background: white;
+    color: #333;
+    transform: rotateY(180deg); /* 미리 뒤집어 놓음 */
+}
+
+/* --- [투표 버그 수정 & 클릭 최적화] --- */
+
+/* 1. 컨테이너가 클릭을 막지 않도록 설정 (투명 벽 제거) */
+.game-area, .table-container {
+    pointer-events: none; 
+}
+
+/* 2. 캐릭터와 테이블 배경은 클릭 가능하게 복구 */
+.player-avatar, .table-bg, .card-container {
+    pointer-events: auto;
+}
+
+/* 3. 말풍선이 캐릭터 클릭을 방해하지 않도록 설정 */
+.bubble {
+    pointer-events: none; 
+}
+
+/* 4. 투표 대상은 최상단으로 끌어올림 */
+.voting-target {
+    z-index: 9999 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    border: 3px solid #ff2e63 !important; /* 시각적으로 더 잘 보이게 */
+}
+
+/* 5. 나(본인)는 투표 때 약간 흐리게 */
+.player-avatar.is-me.voting-mode {
+    opacity: 0.3;
+    cursor: not-allowed !important;
+    border: none !important;
+    animation: none !important;
+}
+
+/* 방장 표시 (닉네임 옆에 왕관 아이콘용) */
+.host-icon {
+    color: #ffd700; /* 금색 */
+    margin-left: 5px;
+    font-size: 1.2rem;
+}
+
+/* 준비 완료 상태 (초록색 테두리 & 체크) */
+.player-avatar.ready-state {
+    border: 4px solid #4cd137 !important;
+    box-shadow: 0 0 15px #4cd137;
+}
+
+/* 준비 완료 텍스트 */
+.ready-badge {
+    position: absolute;
+    top: -10px; right: -10px;
+    background: #4cd137; color: black;
+    border-radius: 50%; width: 20px; height: 20px;
+    font-size: 0.8rem; font-weight: bold;
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* 대기실 버튼 그룹 */
+.btn-group {
+    display: flex; justify-content: center; gap: 10px;
+    position: absolute; bottom: 120px;
+}
+
+/* 준비 버튼 스타일 */
+.ready-btn {
+    background: #00adb5; color: white;
+    font-size: 1.5rem; padding: 15px 40px;
+    box-shadow: 0 0 20px #00adb5;
+}
+.ready-btn.cancel {
+    background: #555; box-shadow: none;
+}

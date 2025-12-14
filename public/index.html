@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>LIAR GAME - Realtime</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        
+        <div id="login-screen" class="screen">
+            <div class="logo-area">🕵️ LIAR GAME</div>
+            <input type="text" id="nickname-input" placeholder="닉네임 (3~8글자)" maxlength="8">
+            <button id="login-btn">입장하기</button>
+        </div>
+
+        <div id="lobby-screen" class="screen hidden">
+            <div class="lobby-header">
+                <h2>대기실</h2>
+                <p id="welcome-msg"></p>
+            </div>
+
+            <div class="create-room-box">
+                <input type="text" id="new-room-name" placeholder="새로운 방 제목을 입력하세요">
+                <button id="create-room-btn">방 만들기</button>
+            </div>
+
+            <div class="room-list-container">
+                <h3>개설된 방 목록</h3>
+                <div id="room-list" class="room-grid">
+                    <div class="no-room-msg">현재 개설된 방이 없습니다.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen hidden">
+            
+            <div class="top-bar">
+                <div class="room-info" id="current-room-name">Room: ?</div>
+                <div class="game-status" id="game-status-msg">대기 중...</div>
+                <button id="leave-btn" class="exit-btn">나가기</button>
+            </div>
+
+            <div class="game-area">
+                <div id="card-area" class="card-container hidden">
+                    <div class="card-inner" id="card-inner">
+                        <div class="card-front">
+                            <span>LIAR<br>GAME</span>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-title">TOPIC</div>
+                            <div id="keyword" class="card-content">???</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-bg">
+                        <div class="center-text">LIAR</div>
+                    </div>
+                    <div id="circle-players-area"></div>
+                </div>
+            </div>
+
+            <div class="bottom-panel">
+                <div id="turn-gauge-container" class="hidden">
+                    <div class="gauge-label">남은 시간</div>
+                    <div class="gauge-bar-bg">
+                        <div id="gauge-bar" class="gauge-bar-fill"></div>
+                    </div>
+                </div>
+
+                <div class="chat-wrapper">
+                    <div id="chat-box" class="mini-chat-log"></div>
+                    <div class="input-area">
+                        <input type="text" id="chat-input" placeholder="게임 시작 대기 중..." disabled>
+                        <button id="send-btn" disabled>전송</button>
+                    </div>
+                </div>
+                
+                <button id="start-game-btn" class="start-btn">GAME START</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/client.js"></script>
+</body>
+</html>
